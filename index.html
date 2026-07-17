@@ -32,7 +32,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* ЭКРАН БЛОКИРОВКИ ПРИ ПЕРВОМ ВХОДЕ */
+        /* ЭКРАН ЗАПРОСА ПАРОЛЯ ПРИ ПЕРВОМ ВХОДЕ */
         #auth-screen {
             position: fixed;
             top: 0;
@@ -161,7 +161,50 @@
 
         .profile-info { flex-grow: 1; min-width: 0; }
         .profile-info .lvl { font-size: 0.9rem; font-weight: 500; margin-bottom: 3px; color: #000; }
-        .profile-info .title { font-size: 1.7rem; font-weight: 400; line-height: 1.2; margin-bottom: 14px; color: #000; }
+        
+        /* Блок имени с карандашом редактирования */
+        .username-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 2px;
+        }
+        .profile-info .title { 
+            font-size: 1.7rem; 
+            font-weight: 600; 
+            line-height: 1.2; 
+            color: #000;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .edit-name-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+        }
+        .edit-name-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: #b5b5b5;
+            transition: fill 0.2s;
+        }
+        .edit-name-btn:hover svg {
+            fill: #9d4edd;
+        }
+        
+        /* Статус подписи роли под именем */
+        .char-role-title {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #A46CAD;
+            margin-bottom: 12px;
+        }
+
         .bar-label-container {
             display: flex;
             justify-content: space-between;
@@ -347,6 +390,18 @@
             fill: none;
         }
 
+        /* Карточка элементов во вкладках */
+        .ui-card {
+            background: #f5f5f5;
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+
         /* --- ФОРМА СОЗДАНИЯ КВЕСТА --- */
         .create-quest-form {
             display: flex;
@@ -399,7 +454,6 @@
         .history-box { display: flex; flex-direction: column; gap: 12px; width: 100%; }
         .history-entry { border-left: 2.5px solid #9d4edd; padding-left: 14px; font-size: 0.85rem; line-height: 1.4; color: #000; }
 
-        /* Кнопка Отмены (крестик) для Разовых */
         .btn-action-undo-svg {
             background: none;
             border: none;
@@ -458,7 +512,16 @@
             
             <div class="profile-info">
                 <div class="lvl" id="char-lvl">Уровень 1</div>
-                <div class="title" id="char-title">Рядовой хаоса</div>
+                
+                <!-- ИСПРАВЛЕНИЕ: Блок Никнейма с кнопкой-карандашом по макету -->
+                <div class="username-container">
+                    <div class="title" id="char-username">ATNV</div>
+                    <button class="edit-name-btn" onclick="changeUsername()" id="edit-name-action-btn">
+                        <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                    </button>
+                </div>
+                <div class="char-role-title" id="char-title">Рядовой хаоса</div>
+
                 <div class="bar-label-container">
                     <span class="xp-label">xp</span>
                     <span class="val-label" id="xp-text">0/100</span>
@@ -468,6 +531,11 @@
                 </div>
             </div>
         </div>
+
+        <!-- Кнопка сброса режима просмотра профиля друга (Скрыта по умолчанию) -->
+        <button id="view-mode-back-btn" class="btn-purple" onclick="exitFriendViewMode()" style="display:none; background:#000; margin-bottom:24px; font-size:1rem; padding:12px;">
+            ← Вернуться в свой профиль
+        </button>
 
         <!-- Статы -->
         <div class="resources-grid">
@@ -510,7 +578,7 @@
                 <div class="slider-bg" style="margin-bottom: 18px;">
                     <div class="slider-fill" id="boss-hp-progress"></div>
                 </div>
-                <button class="btn-purple" onclick="attackBoss()">
+                <button class="btn-purple" id="boss-attack-action-btn" onclick="attackBoss()">
                     Удар 1<svg viewBox="0 0 24 24"><path d="M11.5 2L3 14h7v8l8.5-12h-7z"/></svg>
                 </button>
             </div>
@@ -544,7 +612,7 @@
             </div>
 
             <div class="section-block">
-                <h2>Active tasks</h2>
+                <h2>Активные задачи</h2>
                 <div id="custom-list"></div>
             </div>
 
@@ -579,7 +647,10 @@
                 <h2>Добавить друга</h2>
                 <input type="text" id="friend-code-input" class="input-ui" placeholder="Код друга...">
                 <button class="btn-purple" onclick="addFriend()" style="font-size:0.9rem; padding:12px;">Добавить друга</button>
-                <div class="card-grid" id="friends-list" style="margin-top:28px;"></div>
+                <div style="margin-top:28px; width:100%;">
+                    <h2>Список друзей</h2>
+                    <div id="friends-list" style="margin-top:12px; width:100%;"></div>
+                </div>
             </div>
         </div>
 
@@ -596,7 +667,7 @@
 
     <script>
         // --- ЛОГИКА АВТОРИЗАЦИИ ПРИ ВХОДЕ ---
-        const SECRET_KEY = "atnv2026"; // Задай здесь любой секретный пароль
+        const SECRET_KEY = "atnv2026"; 
         
         function checkAppAuth() {
             const entered = document.getElementById('auth-password-input').value.trim();
@@ -608,7 +679,6 @@
             }
         }
 
-        // Проверка авторизации при загрузке страницы
         if (localStorage.getItem('heroquests_authenticated_v1') === 'true') {
             document.getElementById('auth-screen').style.display = 'none';
         }
@@ -631,6 +701,7 @@
 
         // --- ИНИЦИАЛИЗАЦИЯ СОСТОЯНИЯ ---
         const defaultState = {
+            username: "ATNV", // Кастомный никнейм по умолчанию
             gold: 0, ap: 0, level: 1, xp: 0, avatar: "",
             stats: { STR: 5, INT: 5, DIS: 5 },
             lastCompletedTimestamps: { STR: Date.now(), INT: Date.now(), DIS: Date.now() },
@@ -646,8 +717,11 @@
             friends: []
         };
 
-        let savedData = localStorage.getItem('atnv_state_v9_puredata');
+        let savedData = localStorage.getItem('atnv_state_v10_nicknames');
         let state = savedData ? Object.assign({}, defaultState, JSON.parse(savedData)) : defaultState;
+
+        // Переменная для режима просмотра чужого профиля
+        let activeFriendViewData = null;
 
         const titles = ["Рядовой хаоса", "Борец с ленью", "Магистр дисциплины", "Рыцарь HeroQuests", "Повелитель времени"];
         function getCharacterTitle(lvl) {
@@ -656,8 +730,38 @@
         }
 
         function save() {
-            localStorage.setItem('atnv_state_v9_puredata', JSON.stringify(state));
+            localStorage.setItem('atnv_state_v10_nicknames', JSON.stringify(state));
             updateSyncUI(); render();
+        }
+
+        function changeUsername() {
+            const newName = prompt("Введите ваш новый никнейм:", state.username);
+            if (newName && newName.trim().length > 0) {
+                state.username = newName.trim().substring(0, 15);
+                addLog(`Никнейм изменен на: ${state.username}`); save();
+            }
+        }
+
+        function viewFriendProfile(friendName) {
+            const friend = state.friends.find(f => f.name === friendName);
+            if (!friend) return;
+            activeFriendViewData = friend;
+            
+            // Блокируем управляющие кнопки, пока смотрим чужой профиль
+            document.getElementById('edit-name-action-btn').style.visibility = 'hidden';
+            document.getElementById('boss-attack-action-btn').disabled = true;
+            document.getElementById('view-mode-back-btn').style.display = 'block';
+            
+            render();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function exitFriendViewMode() {
+            activeFriendViewData = null;
+            document.getElementById('edit-name-action-btn').style.visibility = 'visible';
+            document.getElementById('boss-attack-action-btn').disabled = false;
+            document.getElementById('view-mode-back-btn').style.display = 'none';
+            render();
         }
 
         function addLog(text) {
@@ -676,7 +780,10 @@
             if (document.getElementById('settings-menu').classList.contains('active')) toggleSettings();
         }
 
-        function triggerAvatarUpload() { document.getElementById('avatar-input').click(); }
+        function triggerAvatarUpload() { 
+            if(activeFriendViewData) return; // Запрещаем загрузку в режиме просмотра
+            document.getElementById('avatar-input').click(); 
+        }
         function handleAvatarUpload(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -693,15 +800,11 @@
             }
         }
 
-        function toggleSettings() { 
-            const menu = document.getElementById('settings-menu');
-            if (menu) menu.classList.toggle('active'); 
-        }
+        function toggleSettings() { document.getElementById('settings-menu').classList.toggle('active'); }
 
-        // Альтернативный экспорт ТОЛЬКО чистых данных через зашифрованную строку
         function exportProgressКey() {
             const dataToExport = {
-                gold: state.gold, ap: state.ap, level: state.level, xp: state.xp,
+                username: state.username, gold: state.gold, ap: state.ap, level: state.level, xp: state.xp,
                 stats: state.stats, currentWeaponIdx: state.currentWeaponIdx,
                 currentBossIdx: state.currentBossIdx, bossHp: state.bossHp,
                 dailiesStatus: state.dailies.map(d => ({ id: d.id, completed: d.completed }))
@@ -716,13 +819,13 @@
             toggleSettings();
         }
 
-        // Импорт ТОЛЬКО чистых данных без перезаписи структуры разметки
         function importProgressKey() {
             const inputKey = prompt("Вставьте скопированный ранее текстовый ключ данных:");
             if (!inputKey) return;
             try {
                 const parsedData = JSON.parse(decodeURIComponent(escape(atob(inputKey.trim()))));
                 if (parsedData && 'gold' in parsedData && 'stats' in parsedData) {
+                    if (parsedData.username) state.username = parsedData.username;
                     state.gold = parsedData.gold;
                     state.ap = parsedData.ap;
                     state.level = parsedData.level;
@@ -739,43 +842,52 @@
                         });
                     }
                     
-                    save();
-                    alert("Статистика успешно импортирована! Интерфейс сохранен.");
-                    location.reload();
-                } else {
-                    alert("Некорректный ключ данных.");
-                }
-            } catch(e) {
-                alert("Ошибка чтения ключа. Убедитесь, что строка скопирована полностью.");
-            }
+                    save(); alert("Статистика успешно импортирована!"); location.reload();
+                } else { alert("Некорректный ключ данных."); }
+            } catch(e) { alert("Ошибка чтения ключа."); }
             toggleSettings();
         }
 
-        // --- РЕНДЕРИНГ ИНТЕРФЕЙСА (Скругленные SVG-иконки по картинке) ---
+        // --- РЕНДЕРИНГ ИНТЕРФЕЙСА ---
         function render() {
-            document.getElementById('stat-gold').innerText = state.gold;
-            document.getElementById('stat-ap').innerText = state.ap;
-            document.getElementById('stat-str').innerText = state.stats.STR;
-            document.getElementById('stat-int').innerText = state.stats.INT;
-            document.getElementById('char-lvl').innerText = `Уровень ${state.level}`;
-            document.getElementById('char-title').innerText = getCharacterTitle(state.level);
-            document.getElementById('xp-text').innerText = `${state.xp}/100`;
-            document.getElementById('xp-progress').style.width = `${state.xp}%`;
+            // Определяем, чьи данные выводить (свои или друга в режиме просмотра)
+            const renderData = activeFriendViewData ? {
+                username: activeFriendViewData.name,
+                gold: "—", ap: "—",
+                stats: { STR: activeFriendViewData.str, INT: activeFriendViewData.int, DIS: "—" },
+                level: activeFriendViewData.lvl, xp: 0,
+                currentBossIdx: activeFriendViewData.bIdx,
+                bossHp: activeFriendViewData.bHp,
+                currentWeaponIdx: activeFriendViewData.weaponIdx
+            } : {
+                username: state.username, gold: state.gold, ap: state.ap, stats: state.stats,
+                level: state.level, xp: state.xp, currentBossIdx: state.currentBossIdx, 
+                bossHp: state.bossHp, currentWeaponIdx: state.currentWeaponIdx
+            };
+
+            document.getElementById('stat-gold').innerText = renderData.gold;
+            document.getElementById('stat-ap').innerText = renderData.ap;
+            document.getElementById('stat-str').innerText = renderData.stats.STR;
+            document.getElementById('stat-int').innerText = renderData.stats.INT;
+            document.getElementById('char-lvl').innerText = `Уровень ${renderData.level}`;
+            document.getElementById('char-username').innerText = renderData.username;
+            document.getElementById('char-title').innerText = getCharacterTitle(renderData.level);
+            document.getElementById('xp-text').innerText = activeFriendViewData ? "0/100" : `${renderData.xp}/100`;
+            document.getElementById('xp-progress').style.width = activeFriendViewData ? "0%" : `${renderData.xp}%`;
 
             const avImg = document.getElementById('avatar-img'); const avSvg = document.getElementById('avatar-svg');
-            if (state.avatar) { avImg.src = state.avatar; avImg.style.display = 'block'; avSvg.style.display = 'none'; }
+            if (state.avatar && !activeFriendViewData) { avImg.src = state.avatar; avImg.style.display = 'block'; avSvg.style.display = 'none'; }
             else { avImg.style.display = 'none'; avSvg.style.display = 'block'; }
 
-            const boss = bossesDB[state.currentBossIdx];
+            const boss = bossesDB[renderData.currentBossIdx] || bossesDB[0];
             document.getElementById('boss-level-label').innerText = `Босс ${boss.level}`;
             document.getElementById('boss-name-label').innerText = boss.name;
-            document.getElementById('boss-hp-text').innerText = `${state.bossHp}/${boss.maxHp}`;
-            document.getElementById('boss-hp-progress').style.width = `${(state.bossHp / boss.maxHp) * 100}%`;
+            document.getElementById('boss-hp-text').innerText = `${renderData.bossHp}/${boss.maxHp}`;
+            document.getElementById('boss-hp-progress').style.width = `${(renderData.bossHp / boss.maxHp) * 100}%`;
 
             const dList = document.getElementById('daily-list'); dList.innerHTML = '';
             state.dailies.forEach(t => {
                 const div = document.createElement('div'); div.className = 'quest-item';
-                
                 const checkSvg = `<svg class="check-icon-svg" viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
                 const crossSvg = `<svg class="cross-icon-svg" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
                 
@@ -785,8 +897,8 @@
                         <span class="quest-rewards">+10 Золота | <span style="color: #9d4edd;">+1 ${statToName(t.cat)}</span></span>
                     </div>
                     <div class="quest-actions">
-                        ${t.completed ? `<span class="daily-completion-badge">${checkSvg}</span>` : `<button class="btn-action" onclick="completeDaily(${t.id})">Выполнить</button>`}
-                        ${t.completed ? `<button class="daily-completion-svg-btn" onclick="undoDaily(${t.id})">${crossSvg}</button>` : ''}
+                        ${t.completed ? `<span class="daily-completion-badge">${checkSvg}</span>` : `<button class="btn-action" ${activeFriendViewData?'disabled':''} onclick="completeDaily(${t.id})">Выполнить</button>`}
+                        ${t.completed ? `<button class="daily-completion-svg-btn" ${activeFriendViewData?'disabled':''} onclick="undoDaily(${t.id})">${crossSvg}</button>` : ''}
                     </div>`;
                 dList.appendChild(div);
             });
@@ -802,15 +914,15 @@
                         <span class="quest-rewards">${getRewardsHtml(t.diff, t.cat)}</span>
                     </div>
                     <div class="quest-actions">
-                        <button class="btn-action" onclick="completeCustom(${t.id})">Выполнить</button>
-                        <button class="btn-action-undo-svg" onclick="deleteCustom(${t.id})">${trashCrossSvg}</button>
+                        <button class="btn-action" ${activeFriendViewData?'disabled':''} onclick="completeCustom(${t.id})">Выполнить</button>
+                        <button class="btn-action-undo-svg" ${activeFriendViewData?'disabled':''} onclick="deleteCustom(${t.id})">${trashCrossSvg}</button>
                     </div>`;
                 cList.appendChild(div);
             });
 
             const compBlock = document.getElementById('completed-block');
             const compList = document.getElementById('completed-list');
-            if (state.completedTasksToday.length > 0) {
+            if (state.completedTasksToday.length > 0 && !activeFriendViewData) {
                 compBlock.style.display = 'block'; compList.innerHTML = '';
                 state.completedTasksToday.forEach(t => {
                     const div = document.createElement('div'); div.className = 'quest-item';
@@ -828,20 +940,30 @@
                 });
             } else { compBlock.style.display = 'none'; }
 
-            document.getElementById('shop-weapon-idx').innerText = state.currentWeaponIdx;
-            document.getElementById('shop-equipped-info').innerText = `Экипировано: ${weaponsDB[state.currentWeaponIdx].name}`;
+            document.getElementById('shop-weapon-idx').innerText = renderData.currentWeaponIdx;
+            document.getElementById('shop-equipped-info').innerText = `Экипировано: ${weaponsDB[renderData.currentWeaponIdx].name}`;
             const nw = weaponsDB[state.currentWeaponIdx + 1];
             if (nw) {
                 document.getElementById('shop-next-name').innerText = nw.name;
                 document.getElementById('shop-next-stats').innerText = `Урон: +${nw.damage} (Цена: ${nw.cost} Золота)`;
                 const bBtn = document.getElementById('shop-buy-btn');
-                bBtn.innerText = `Купить за ${nw.cost}`; bBtn.disabled = state.gold < nw.cost;
+                bBtn.innerText = `Купить за ${nw.cost}`; bBtn.disabled = state.gold < nw.cost || activeFriendViewData !== null;
             }
             document.getElementById('history-log-box').innerHTML = state.log.map(e => `<div class="history-entry">${e}</div>`).join('');
+            
+            // Список друзей с кнопкой перехода на их профиль
             const fList = document.getElementById('friends-list'); fList.innerHTML = '';
             state.friends.forEach(f => {
                 const div = document.createElement('div'); div.className = 'ui-card';
-                div.innerHTML = `<div class="quest-info"><span class="quest-title">[LVL ${f.lvl}] ${f.name}</span><span class="quest-rewards">Урон: ${weaponsDB[f.weaponIdx].damage}</span></div><button class="btn-action" style="background:#000;" onclick="removeFriend('${f.name}')">X</button>`;
+                div.innerHTML = `
+                    <div class="quest-info">
+                        <span class="quest-title">[LVL ${f.lvl}] ${f.name}</span>
+                        <span class="quest-rewards">Оружие грейд: +${f.weaponIdx}</span>
+                    </div>
+                    <div style="display:flex; gap: 8px; align-items:center;">
+                        <button class="btn-action" style="background:#9d4edd; padding: 6px 12px; font-size:0.75rem;" onclick="viewFriendProfile('${f.name}')">Просмотр</button>
+                        <button class="btn-action" style="background:#000; padding: 6px 10px;" onclick="removeFriend('${f.name}')">X</button>
+                    </div>`;
                 fList.appendChild(div);
             });
         }
@@ -853,13 +975,15 @@
 
         // --- ДЕЙСТВИЯ ---
         function completeDaily(id) {
+            if(activeFriendViewData) return;
             const t = state.dailies.find(q => q.id === id);
             if (t && !t.completed) {
-                t.completed = true; state.gold += 10; state.ap += 1; state.stats[t.stat] += 1;
+                t.completed = true; state.gold += 10; state.ap += 1; state.stats[t.cat] += 1;
                 gainXp(10); addLog(`Выполнен: "${t.text}".`); save();
             }
         }
         function undoDaily(id) {
+            if(activeFriendViewData) return;
             const t = state.dailies.find(q => q.id === id);
             if (t && t.completed) {
                 t.completed = false; state.gold -= 10; state.ap -= 1; state.stats[t.cat] -= 1;
@@ -868,6 +992,7 @@
         }
         document.getElementById('quest-form').addEventListener('submit', (e) => {
             e.preventDefault();
+            if(activeFriendViewData) return;
             const newQ = { id: Date.now(), text: document.getElementById('quest-name').value, cat: document.getElementById('quest-cat').value, diff: document.getElementById('quest-diff').value };
             if (document.getElementById('quest-is-daily').checked) {
                 newQ.completed = false; state.dailies.push(newQ); addLog(`Создан ежедневный: "${newQ.text}"`);
@@ -875,6 +1000,7 @@
             document.getElementById('quest-form').reset(); save();
         });
         function completeCustom(id) {
+            if(activeFriendViewData) return;
             const t = state.customTasks.find(q => q.id === id);
             if (t) {
                 state.gold += (t.diff==='easy'?10:t.diff==='medium'?20:40); state.ap += (t.diff==='easy'?1:t.diff==='medium'?2:3);
@@ -884,6 +1010,7 @@
             }
         }
         function undoCustom(id) {
+            if(activeFriendViewData) return;
             const t = state.completedTasksToday.find(q => q.id === id);
             if (t) {
                 state.gold -= (t.diff==='easy'?10:t.diff==='medium'?20:40); state.ap -= (t.diff==='easy'?1:t.diff==='medium'?2:3);
@@ -892,12 +1019,14 @@
                 addLog(`Откат: "${t.text}". Очки вычтены.`); save();
             }
         }
-        function deleteCustom(id) { state.customTasks = state.customTasks.filter(q => q.id !== id); addLog(`Квест удален.`); save(); }
+        function deleteCustom(id) { if(activeFriendViewData) return; state.customTasks = state.customTasks.filter(q => q.id !== id); addLog(`Квест удален.`); save(); }
         function buyNextWeapon() {
+            if(activeFriendViewData) return;
             const nw = weaponsDB[state.currentWeaponIdx + 1];
             if (nw && state.gold >= nw.cost) { state.gold -= nw.cost; state.currentWeaponIdx++; addLog(`Куплено: ${nw.name}`); save(); }
         }
         function attackBoss() {
+            if(activeFriendViewData) return;
             if (state.ap < 1) { alert("Нет Энергии!"); return; }
             state.ap--; state.bossHp = Math.max(0, state.bossHp - (weaponsDB[state.currentWeaponIdx].damage + state.stats.STR + 1));
             if (state.bossHp === 0) {
@@ -906,19 +1035,27 @@
             }
             save();
         }
+        
+        // Экспорт подгружает твой уникальный никнейм
         function updateSyncUI() {
-            const payload = { n: "Герой ATNV", lvl: state.level, wIdx: state.currentWeaponIdx, bIdx: state.currentBossIdx, s: state.stats.STR, i: state.stats.INT };
+            const payload = { n: state.username, lvl: state.level, wIdx: state.currentWeaponIdx, bIdx: state.currentBossIdx, bHp: state.bossHp, str: state.stats.STR, int: state.stats.INT };
             document.getElementById('sync-code-box').value = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
         }
         function copySyncCode() { document.getElementById("sync-code-box").select(); document.execCommand("copy"); alert("Код скопирован!"); }
+        
+        // Добавление учитывает имя друга из кода
         function addFriend() {
             try {
                 const decoded = JSON.parse(decodeURIComponent(escape(atob(document.getElementById('friend-code-input').value.trim()))));
-                state.friends.push({ name: prompt("Имя друга:", decoded.n), lvl: decoded.lvl, weaponIdx: decoded.wIdx, bossLevel: decoded.bIdx + 1 });
-                document.getElementById('friend-code-input').value = ''; save();
+                const finalFriendName = prompt("Подтвердите или измените имя друга:", decoded.n || "Герой");
+                if (finalFriendName) {
+                    state.friends = state.friends.filter(f => f.name !== finalFriendName);
+                    state.friends.push({ name: finalFriendName, lvl: decoded.lvl, weaponIdx: decoded.wIdx, bIdx: decoded.bIdx, bHp: decoded.bHp, str: decoded.str, int: decoded.int });
+                    document.getElementById('friend-code-input').value = ''; save();
+                }
             } catch(e) { alert("Ошибка кода!"); }
         }
-        function removeFriend(name) { state.friends = state.friends.filter(f => f.name !== name); save(); }
+        function removeFriend(name) { state.friends = state.friends.filter(f => f.name !== name); if(activeFriendViewData && activeFriendViewData.name === name) exitFriendViewMode(); save(); }
 
         const todayStr = new Date().toDateString();
         if (localStorage.getItem('atnv_state_v9_puredata_DATE') !== todayStr) {
